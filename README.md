@@ -12,4 +12,5 @@ This project involves converting Figma JSON variables to a SCSS variable structu
    1. Check the and update the installed Python version.
    2. requisites: Homebrew: <https://brew.sh/> - installed with `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)`
 2. FigSass Smart Contract **algorithm:**
-   1. Objective 1: Read the Figma JSON file using a python data object
+   1. Read the Figma JSON file using a python data object
+   2. Export data into a file with extension .scss

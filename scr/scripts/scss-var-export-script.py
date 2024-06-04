@@ -8,6 +8,7 @@
 #!/usr/bin/env python
 
 import random
+import os
 
 # Function to generate dummy SASS variables
 def generate_sass_variables(num_variables=10):
@@ -30,12 +31,14 @@ def generate_sass_variables(num_variables=10):
     return sass_variables
 
 # Function to export variables to a .scss file
-def export_to_scss(variables, filename="variables.scss"):
-    with open(filename, 'w') as file:
+def export_to_scss(variables, filepath="output/scss/", filename="variables.scss"):
+    path= os.path.abspath(filepath)
+    output=path+"/"+filename    
+    with open(output, 'w') as file:
         file.write("// Generated SASS Variables\n\n")
         for variable in variables:
             file.write(f"${variable['name']}: {variable['value']};\n")
-    print(f"Variables exported to {filename}")
+    print(f"Variables exported to {filename} to {output}")
 
 # Main function
 def main():

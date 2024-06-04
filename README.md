@@ -4,7 +4,9 @@
 Project name: FigSass Smart Contract
 ```
 
-This project involves converting Figma JSON variables to a SCSS variable structure. A smart contract will be implemented to automate the conversion of a Figma variable JSON export into the relevant list of variables and place them into a SCSS file.
+This endeavor revolves around transforming Figma JSON variables into a SCSS variable framework. We'll employ a smart contract to streamline the process of converting Figma variable JSON exports into a corresponding array of variables, which will then be integrated into a SCSS file.
+
+Author's note: While we draw upon the principles of Ethereum smart contracts, this project does not pertain to blockchain Ethereum smart contracts. Instead, it operates as a mini-application based on smart contract principles.
 
 ## The Algorithm
 

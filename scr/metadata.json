@@ -1,0 +1,18 @@
+{
+  "figma": {
+    "blueprint": {
+      "keys": ["id", "name", "modes", "variableIds", "variables"],
+      "variables": [
+        "id",
+        "name",
+        "description",
+        "type",
+        "valuesByMode",
+        "resolvedValuesByMode",
+        "scopes",
+        "hiddenFromPublishing",
+        "codeSyntax"
+      ]
+    }
+  }
+}

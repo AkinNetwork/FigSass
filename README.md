@@ -1,8 +1,6 @@
 # FigSass Smart Contract
 
-```python
-Project name: FigSass Smart Contract
-```
+Project name: _FigSass Smart Contract_
 
 This endeavor revolves around transforming Figma JSON variables into a SCSS variable framework. We'll employ a smart contract to streamline the process of converting Figma variable JSON exports into a corresponding array of variables, which will then be integrated into a SCSS file.
 
@@ -16,3 +14,5 @@ Author's note: While we draw upon the principles of Ethereum smart contracts, th
 2. FigSass Smart Contract **algorithm:**
    1. Read the Figma JSON file using a python data object
    2. Export data into a file with extension .scss
+   3. Check and validate the imported JSON file as Figma variable JSON file
+   4. Format the variables as SCSS variables and save them into \_variables.scss file

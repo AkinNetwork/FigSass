@@ -43,7 +43,7 @@ def get_json_data (directory, filename):
         result['status'] = False
         result['message'] = str(e)
     finally:
-        print("Finished checking and reading the JSON file")
+        print("END FUNCTION - get_json_data -- Finished checking and reading the JSON file")
         #print (result)
     
     return result
@@ -81,54 +81,82 @@ def get_metadata(par):
         result['message'] = str(e)
     
     finally:
-        print("Finished extracting data from metadata.json")
+        print("END FUNCTION - get_metadata --Finished extracting data from metadata.json")
         
     return result
      
 # Function that confirms the Figma object structure
 def is_figma_data (d):
-    ost = check_figma_data (d)
-    if ost[0]:
-        for v in d['variables']:
-           ost = check_figma_data(v, 'variables')
-           if not ost[0]:
-               print(f"Error: '{ost[1]}'")
-               break
-
-    return ost    
-
-
-# Functions that verifies the object structure against the figma blueprint object
-def check_figma_data (o, p='keys'):
     
     response = [True, ""]
     
     # Retrieve the Figma blueprint from the FigSass Smart Contract metadata.json
     meta_snipped = get_metadata('figma')
+    
+    try:  
+        # Check the metadata and exit if the blueprint is not configured
+        if not meta_snipped['status']:
+            raise TypeError (f"Error: '{meta_snipped['message']}")
+
+        else:
+            # Extract the blueprint data and begin analysing the Figma object.
+            # Confirm that the blueprint data is available; otherwise, raise an exception.
+            if 'blueprint' not in meta_snipped ['data']:
+                raise ValueError (f"Error: the Figma variable blueprint is not configured")
+        
+        # Extract the comparison data from the Figma blueprint 
+        blueprint = meta_snipped['data']['blueprint']
+        blueprint_keys = get_keys_list (blueprint)
+        
+        # Confirm that the blueprint parameters are configured; otherwise, raise an exception
+        if not len(blueprint_keys)>0:
+            raise ValueError (f"Error: the Figma blueprint parameters are missing")
+        
+        # Analyze each Figma dictionary snippet by comparing its keys with the requirements defined in the blueprint
+        for bk in blueprint_keys:
+            if bk == '1':
+                response = check_figma_data(d, blueprint[bk])
+                if not response[0]:
+                    break
+            elif bk == '2':
+                sk = get_keys_list(blueprint[bk])
+                if not sk:
+                    raise ValueError("Error: the Figma blueprint configuration is incomplete")
+                    
+                for ssk in sk:
+                    for snippet in d[ssk]:
+                        response = check_figma_data(snippet,blueprint[bk][ssk] )
+                        if not response[0]:
+                            break
+    # Manage response in case of exceptions
+    except (TypeError, ValueError) as e:
+        response = [False, str(e)]
+    
+    finally:
+       print("END FUNCTION - is_figma_data --Finished extracting data from metadata.json")
+    
+    return response    
+
+
+# Functions that verifies the object structure against the figma blueprint object
+def check_figma_data (o, blueprint):
+    
+    response = [True, ""]
    
     # Extract the primary keys of the object and compare them with the top_level_keys blueprint
     ojk= get_keys_list(o)    
-  
-    # The actual validation/ authentication process   
+    
+    # The actual comparison of the data snipped with the blueprint key list 
     try:
         if ojk is None:
-            raise ValueError ("The Figma object value is none")
-        
-        if not meta_snipped['status']:
-            raise ValueError (f"Error: '{meta_snipped['message']}")
-        
-        else:
-            if 'blueprint' not in meta_snipped ['data']:
-                raise ValueError (f"Error: the Figma variable blueprint is not configured")
-  
-        response = [ojk == meta_snipped['data']['blueprint'][p], f"The keys in the document {'match' if ojk == meta_snipped['data']['blueprint'][p] else 'do not match'} the Figma variable object structure."]
-            
+            raise ValueError ("The Figma snippet is not valid")
+        response = [ojk == blueprint, f"The keys in the snippet {'match' if ojk == blueprint else 'do not match'} the Figma variable object structure."]       
     
     except ValueError as e:
-       response = [False, str(e)]
+        response = [False, str(e)]
        
     finally:
-       print (f"Finished checking the data relevant to the '{p}' key") 
+        print (f"END FUNCTION - check_figma_data - Finished checking the snipped data with response: {response[1]}") 
         
     return response
 
@@ -158,7 +186,7 @@ def get_figma_data(folder, json_file):
         
         
     finally:
-        print("Finished extracting and validating data from the Figma variable JSON file")        
+        print("END FUNCTION - get_figma_data - Finished extracting and validating data from the Figma variable JSON file")        
     
     return fig_data
 

@@ -16,5 +16,8 @@
         ]
       }
     }
+  },
+  "scss": {
+    "theme": ["Akin Network", "Akin GetHub", "Akin MarTech", "Akin DigiCraft"]
   }
 }

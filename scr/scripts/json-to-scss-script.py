@@ -336,18 +336,26 @@ def is_variable_scss(file_path, variable_name):
         
 # Main function
 def main():
-    # extract the data from the Figma file
-    figma_data = get_figma_data ("fig", "Primitives_ Sizes.json")
-    # process te variables from Figma Data
-    variables = []
+    
+    #indicate directory from which the json files shall be processed
+    directory ="fig"
+    
+    #pass through all files available in the directory
+    for filename in os.listdir(directory):
+        print (f"directory: {directory} and file: {filename}")
+        # extract the data from the Figma file
+        figma_data = get_figma_data (directory, filename)
 
-    fm = get_modes (figma_data['data']['modes'])
-    for vo in figma_data['data']['variables']:
-        get_fig_var_spec (vo, fm, variables) #this function extends the variables array with new processed data
+        # process te variables from Figma Data
+        variables = []
 
-   
-    # export variables to the respective scss files
-    export_to_scss(variables)
+        fm = get_modes (figma_data['data']['modes'])
+        for vo in figma_data['data']['variables']:
+            get_fig_var_spec (vo, fm, variables) #this function extends the variables array with new processed data
+            
+            
+        # export variables to the respective scss files
+        export_to_scss(variables)
 
 if __name__ == "__main__":
     main()

@@ -1,16 +1,12 @@
 from .json_processor import JSONProcessor
+from functools import lru_cache
 
 class DataValidatorProcessor:
     def __init__(self, metadata_dir):
         self.metadata_dir = metadata_dir
     
+    @lru_cache(maxsize=32)
     def get_metadata(self, key):
-        result = {
-            "status": True,
-            "message": "",
-            "data": {}
-        }
-        
         try:
             if not isinstance(key, str):
                 raise ValueError(f"Error: the '{key}' is not a valid key")
@@ -23,20 +19,14 @@ class DataValidatorProcessor:
             if key not in metadata['data']:
                 raise KeyError(f"The key '{key}' does not exist in the JSON object.")
             
-            result['data'] = metadata['data'][key]
-            result['message'] = f"Success: the data pertaining to the '{key}' key has been retrieved."
-
-        except (FileNotFoundError, ValueError, KeyError) as e:
-            result['status'] = False
-            result['message'] = str(e)
+            return {"status": True, "message": "Success", "data": metadata['data'][key]}
         
-        return result
+        except (FileNotFoundError, ValueError, KeyError) as e:
+            return {"status": False, "message": str(e), "data": {}}
     
     def is_figma_data(self, data):
-        response = [True, ""]
-        meta_snipped = self.get_metadata('figma')
-        
         try:
+            meta_snipped = self.get_metadata('figma')
             if not meta_snipped['status']:
                 raise TypeError(f"Error: '{meta_snipped['message']}'")
 
@@ -46,43 +36,30 @@ class DataValidatorProcessor:
             blueprint = meta_snipped['data']['blueprint']
             blueprint_keys = list(blueprint.keys())
 
-            if not len(blueprint_keys) > 0:
+            if not blueprint_keys:
                 raise ValueError("Error: the Figma blueprint parameters are missing")
 
             for bk in blueprint_keys:
                 if bk == '1':
                     response = self.check_figma_data(data, blueprint[bk])
                     if not response[0]:
-                        break
+                        return response
                 elif bk == '2':
-                    sk = list(blueprint[bk].keys())
-                    if not sk:
-                        raise ValueError("Error: the Figma blueprint configuration is incomplete")
-                    
-                    for ssk in sk:
-                        for snippet in data[ssk]:
+                    for ssk in blueprint[bk]:
+                        for snippet in data.get(ssk, []):
                             response = self.check_figma_data(snippet, blueprint[bk][ssk])
                             if not response[0]:
-                                break
+                                return response
+
+            return [True, "Figma data is valid"]
 
         except (TypeError, ValueError) as e:
-            response = [False, str(e)]
-        
-        return response
+            return [False, str(e)]
     
-    def check_figma_data(self, obj, blueprint):
-        response = [True, ""]
+    @staticmethod
+    def check_figma_data(obj, blueprint):
         obj_keys = list(obj.keys())
-        
-        try:
-            if obj_keys is None:
-                raise ValueError("The Figma snippet is not valid")
-            response = [obj_keys == blueprint, f"The keys in the snippet {'match' if obj_keys == blueprint else 'do not match'} the Figma variable object structure."]
-        
-        except ValueError as e:
-            response = [False, str(e)]
-        
-        return response
+        return [obj_keys == blueprint, f"The keys in the snippet {'match' if obj_keys == blueprint else 'do not match'} the Figma variable object structure."]
 
     def get_figma_data(self, folder, json_file):
         fig_data = JSONProcessor(folder).get_json_data(json_file)
@@ -103,13 +80,10 @@ class DataValidatorProcessor:
         
         return fig_data
     
-    def css_rgba_to_decimal(self, rgba):
+    @staticmethod
+    def css_rgba_to_decimal(rgba):
         rgba = (rgba["r"], rgba["g"], rgba["b"], rgba["a"])
-        if isinstance(rgba, str):
-            rgba = tuple(int(x) for x in rgba.split(','))
-        
-        r, g, b, a = rgba
-        return (int(r * 255), int(g * 255), int(b * 255), round(a, 2))
+        return (int(rgba[0] * 255), int(rgba[1] * 255), int(rgba[2] * 255), round(rgba[3], 2))
 
     def get_fig_var_spec(self, fvo, vm, variables):
         variable_name = "$" + fvo['name'].split("/")[-1].replace(" ", "-").replace("--", "-")
@@ -118,16 +92,12 @@ class DataValidatorProcessor:
             for key, value in fvo['valuesByMode'].items():
                 variable_value = f"rgba{self.css_rgba_to_decimal(value)}" if fvo['type'] == 'COLOR' else f"{int(value / 16) if (value / 16).is_integer() else round(value / 16, 3)} rem" if fvo['type'] == 'FLOAT' else ""
                 variable_theme = vm[key] if 'mode' not in vm[key].strip() else ""
-                v = {
+                variables.append({
                     "name": variable_name,
                     "value": variable_value,
                     "theme": variable_theme
-                }
-                variables.append(v)
+                })
 
-    def get_modes(self, m):
-        ft = {}
-        for key, value in m.items():
-            fv = value.lower().replace(" ", "_").replace("__", "_")
-            ft[key] = fv
-        return ft
+    @staticmethod
+    def get_modes(m):
+        return {key: value.lower().replace(" ", "_").replace("__", "_") for key, value in m.items()}

@@ -166,3 +166,5 @@ cython_debug/
 
 # All automated outputs
 output/*
+*/output/*
+

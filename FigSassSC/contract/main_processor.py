@@ -8,7 +8,7 @@ class MainProcessor:
         self.export_path = export_path
 
     def main(self):
-        validator_processor = DataValidatorProcessor("scr/")
+        validator_processor = DataValidatorProcessor("env/")
         exporter = DataExporter(self.export_path)
 
         for filename in os.listdir(self.directory):

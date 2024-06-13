@@ -4,8 +4,11 @@ def run_test():
     # Specify the directory containing your Figma JSON files
     directory = "fig"
     
-    # Create an instance of MainProcessor with the directory
-    processor = MainProcessor(directory)
+    # Specify the path where the SCSS files will be exported
+    export_path = "output/scss/"
+    
+    # Create an instance of MainProcessor with the directory and export path
+    processor = MainProcessor(directory, export_path)
     
     # Run the main process
     processor.main()

@@ -3,7 +3,7 @@ from .data_validator_processor import DataValidatorProcessor
 from .data_exporter import DataExporter
 
 class MainProcessor:
-    def __init__(self, directory, export_path="output/scss/"):
+    def __init__(self, directory, export_path):
         self.directory = directory
         self.export_path = export_path
 
@@ -24,8 +24,3 @@ class MainProcessor:
                 for vo in figma_data['data']['variables']:
                     validator_processor.get_fig_var_spec(vo, fm, variables)
                 exporter.export_to_scss(variables)
-
-if __name__ == "__main__":
-    processor = MainProcessor("fig", "output/scss/")
-    processor.main()
-

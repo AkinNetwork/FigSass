@@ -33,3 +33,14 @@ class JSONProcessor:
             result['message'] = str(e)
         
         return result
+
+    def validate_json_files(self):
+        json_files_data = []
+        for filename in os.listdir(self.directory):
+            if filename.endswith('.json'):
+                json_data = self.get_json_data(filename)
+                if json_data['status']:
+                    json_files_data.append(json_data['data'])
+                else:
+                    print(f"Error processing {filename}: {json_data['message']}")
+        return json_files_data

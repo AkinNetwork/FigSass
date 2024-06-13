@@ -1,4 +1,5 @@
 import os
+from .json_processor import JSONProcessor
 from .data_validator_processor import DataValidatorProcessor
 from .data_exporter import DataExporter
 
@@ -8,19 +9,19 @@ class MainProcessor:
         self.export_path = export_path
 
     def main(self):
-        validator_processor = DataValidatorProcessor("env/")
+        json_processor = JSONProcessor(self.directory)
+        validator_processor = DataValidatorProcessor("scr/")
         exporter = DataExporter(self.export_path)
 
-        for filename in os.listdir(self.directory):
-            if filename.endswith('.json'):
-                print(f"Processing directory: {self.directory}, file: {filename}")
-                figma_data = validator_processor.get_figma_data(self.directory, filename)
-                if not figma_data['status']:
-                    print(f"Error processing {filename}: {figma_data['message']}")
-                    continue
+        json_files_data = json_processor.validate_json_files()
+        
+        for data in json_files_data:
+            variables = []
+            fm = validator_processor.get_modes(data['modes'])
+            for vo in data['variables']:
+                validator_processor.get_fig_var_spec(vo, fm, variables)
+            exporter.export_to_scss(variables)
 
-                variables = []
-                fm = validator_processor.get_modes(figma_data['data']['modes'])
-                for vo in figma_data['data']['variables']:
-                    validator_processor.get_fig_var_spec(vo, fm, variables)
-                exporter.export_to_scss(variables)
+if __name__ == "__main__":
+    processor = MainProcessor("fig", "output/scss/")
+    processor.main()

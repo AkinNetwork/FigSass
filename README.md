@@ -55,3 +55,14 @@ FigSassSC/
 `python test_script.py`
 
 This will run the MainProcessor's main function, which processes the JSON files in the specified directory (fig), validates them, processes them, and exports the results.
+
+### Running FigSass as CLI
+
+You can now run the script from the command line and provide the directory and output path:
+
+`python figsass.py fig --output custom_output/scss/`
+
+This will:
+
+1. Use the fig directory for input files.
+2. Export the SCSS files to custom_output/scss/.

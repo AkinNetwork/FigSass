@@ -10,7 +10,7 @@ class MainProcessor:
 
     def main(self):
         json_processor = JSONProcessor(self.directory)
-        validator_processor = DataValidatorProcessor("scr/")
+        validator_processor = DataValidatorProcessor("env/")
         exporter = DataExporter(self.export_path)
 
         json_files_data = json_processor.validate_json_files()

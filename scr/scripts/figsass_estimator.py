@@ -1,6 +1,6 @@
 import timeit
-from .json_processor import JSONProcessor
-from .data_validator_processor import DataValidatorProcessor
+from ...FigSassSC.contract.json_processor import JSONProcessor
+from ...FigSassSC.contract.data_validator_processor import DataValidatorProcessor
 
 class FigsassEstimator:
     def __init__(self, directory):

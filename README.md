@@ -40,8 +40,11 @@ FigSassSC/
 │ ├── file1.json
 │ └── file2.json
 │
+└── env
+│ └── metadata.json
+│
 └── test_script.py
-└── metadata.json
+└── figsass.py
 
 ### Running the Test Script
 
@@ -66,3 +69,41 @@ This will:
 
 1. Use the fig directory for input files.
 2. Export the SCSS files to custom_output/scss/.
+
+## CPU Effort estimator for one execution.
+
+### Detailed Steps for ach Execution
+
+1. Reading JSON:
+
+   - Method: get_json_data
+   - Class: JSONProcessor
+   - Process: Open the JSON file, read its contents, and parse it into a dictionary.
+   - Execution: Loading the file "sample.json" and converting it to a Python dictionary.
+
+2. Validation:
+
+   - Method: is_figma_data
+   - Class: DataValidatorProcessor
+   - Process: Check the presence of necessary keys, correct data types, and values within the JSON data.
+   - Execution: Validating the JSON dictionary to ensure it matches expected metadata and blueprint structures.
+
+3. Figma Validation:
+
+   - Method: is_figma_data (further processing)
+   - Class: DataValidatorProcessor
+   - Process: Compare the Figma JSON data against the Figma blueprint, ensuring all required fields and structures are present.
+   - Execution: Detailed validation of the Figma-specific JSON structure.
+
+4. Figma Variable Generation:
+
+   - Method: get_fig_var_spec
+   - Class: DataValidatorProcessor
+   - Process: Extract Figma variables from the JSON data, format them, and prepare them for export.
+   - Execution: Converting JSON data fields into SCSS variable definitions.
+
+5. Exporting to SCSS:
+   - Method: export_to_scss
+   - Class: DataExporter
+   - Process: Write the generated SCSS variables to the appropriate files and directories.
+   - Execution: Writing the SCSS variables to "variables.scss" files in the specified output directory.

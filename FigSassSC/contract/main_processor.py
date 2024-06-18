@@ -33,45 +33,41 @@ class MainProcessor:
     def estimate_cpu_effort(self, filename):
         try:
             print(f"Estimating CPU effort for processing {filename}...\n")
-
-            # Initialize variables
-            cpu_effort_json = 0
-            cpu_effort_validation = 0
-            cpu_effort_figma_validation = 0
-            cpu_effort_figma_variable_generation = 0
-            cpu_effort_exporting = 0
             
             # Reading JSON
-            cpu_effort_json = self.cpu_estimator.estimate_cpu_effort_for_reading(filename)
-            print(f"CPU Effort for reading {filename}: {cpu_effort_json:.6f} seconds for 1000 executions")
+            single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_reading(filename)
+            print(f"CPU Effort for reading {filename}: {single_execution_time:.6f} seconds for a single execution")
+            print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
 
             # Validation
-            cpu_effort_validation = self.cpu_estimator.estimate_cpu_effort_for_validation(filename)
-            print(f"CPU Effort for validating {filename}: {cpu_effort_validation:.6f} seconds for 1000 executions")
+            single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_validation(filename)
+            print(f"CPU Effort for validating {filename}: {single_execution_time:.6f} seconds for a single execution")
+            print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
 
             json_data = self.json_processor.get_json_data(filename)
             if json_data['status']:
                 # Figma Validation
-                cpu_effort_figma_validation = self.cpu_estimator.estimate_cpu_effort_for_figma_validation(json_data['data'])
-                print(f"CPU Effort for Figma validation: {cpu_effort_figma_validation:.6f} seconds for 1000 executions")
+                single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_figma_validation(json_data['data'])
+                print(f"CPU Effort for Figma validation: {single_execution_time:.6f} seconds for a single execution")
+                print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
 
                 # Figma Variable Generation
-                cpu_effort_figma_variable_generation = self.cpu_estimator.estimate_cpu_effort_for_figma_variable_generation(json_data['data'])
-                print(f"CPU Effort for Figma variable generation: {cpu_effort_figma_variable_generation:.6f} seconds for 1000 executions")
+                single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_figma_variable_generation(json_data['data'])
+                print(f"CPU Effort for Figma variable generation: {single_execution_time:.6f} seconds for a single execution")
+                print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
 
                 # Exporting
                 variables = []
                 fm = self.validator_processor.get_modes(json_data['data']['modes'])
                 for vo in json_data['data']['variables']:
                     self.validator_processor.get_fig_var_spec(vo, fm, variables)
-                cpu_effort_exporting = self.cpu_estimator.estimate_cpu_effort_for_exporting(variables)
-                print(f"CPU Effort for exporting: {cpu_effort_exporting:.6f} seconds for 1000 executions")
+                single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_exporting(variables)
+                print(f"CPU Effort for exporting: {single_execution_time:.6f} seconds for a single execution")
+                print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
 
             # Total CPU effort for the whole process
-            total_cpu_effort = (cpu_effort_json + cpu_effort_validation +
-                                cpu_effort_figma_validation + cpu_effort_figma_variable_generation +
-                                cpu_effort_exporting)
-            print(f"Total CPU Effort for processing {filename}: {total_cpu_effort:.6f} seconds for 1000 executions")
+            total_cpu_effort = (single_execution_time + executions_needed)
+            print(f"Total CPU Effort for processing {filename}: {total_cpu_effort:.6f} seconds for a single execution")
         except ValueError as e:
             print(e)
 

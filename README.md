@@ -70,7 +70,7 @@ This will:
 1. Use the fig directory for input files.
 2. Export the SCSS files to custom_output/scss/.
 
-## CPU Effort estimator for one execution.
+## CPU Effort estimator for one execution
 
 ### Detailed Steps for ach Execution
 

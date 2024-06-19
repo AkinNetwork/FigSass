@@ -1,7 +1,7 @@
-import psutil
+import psutil # type: ignore
 import platform
 import subprocess
-import cpuinfo
+import cpuinfo # type: ignore
 
 def get_system_info():
     # Get basic system info

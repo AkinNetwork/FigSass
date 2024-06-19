@@ -1,4 +1,4 @@
-import psutil
+import psutil # type: ignore
 
 '''
 The psutil library can provide information about CPU usage, memory usage, and other system-related metrics, but it doesn't provide TDP directly.

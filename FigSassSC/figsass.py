@@ -13,7 +13,7 @@ def run():
     processor = MainProcessor(args.directory, args.output)
 
     if args.estimate_cpu:
-        processor.estimate_cpu_effort(args.filename)
+        processor.estimate_total_cpu_effort(args.filename)
     else:
         processor.main()
 

@@ -1,0 +1,46 @@
+{
+  "id": "VariableCollectionId:2:6",
+  "name": ".Primitives: Akin Colours",
+  "modes": {
+    "2:2": "Akin Network",
+    "2:3": "Akin GetHub",
+    "2:4": "Akin MarTech",
+    "2:5": "Akin DigiCraft"
+  },
+  "variableIds": ["VariableID:2:7"],
+  "variables": [
+    {
+      "id": "VariableID:2:7",
+      "name": "Akin Neutral/akin neutral 0",
+      "description": "",
+      "type": "COLOR",
+      "valuesByMode": {
+        "2:2": { "r": 1, "g": 1, "b": 1, "a": 1 },
+        "2:3": { "r": 1, "g": 1, "b": 1, "a": 1 },
+        "2:4": { "r": 1, "g": 1, "b": 1, "a": 1 },
+        "2:5": { "r": 1, "g": 1, "b": 1, "a": 1 }
+      },
+      "resolvedValuesByMode": {
+        "2:2": {
+          "resolvedValue": { "r": 1, "g": 1, "b": 1, "a": 1 },
+          "alias": null
+        },
+        "2:3": {
+          "resolvedValue": { "r": 1, "g": 1, "b": 1, "a": 1 },
+          "alias": null
+        },
+        "2:4": {
+          "resolvedValue": { "r": 1, "g": 1, "b": 1, "a": 1 },
+          "alias": null
+        },
+        "2:5": {
+          "resolvedValue": { "r": 1, "g": 1, "b": 1, "a": 1 },
+          "alias": null
+        }
+      },
+      "scopes": ["ALL_SCOPES"],
+      "hiddenFromPublishing": false,
+      "codeSyntax": {}
+    }
+  ]
+}

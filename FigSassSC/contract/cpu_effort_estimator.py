@@ -9,11 +9,16 @@ class CPUEffortEstimator:
         self.validator_processor = DataValidatorProcessor(metadata_dir)
         self.exporter = DataExporter(export_path)
 
-    def time_single_execution(self, setup_code, test_code):
-        return timeit.timeit(stmt=test_code, setup=setup_code, number=1)
+    def time_single_execution(self, setup_code, test_code, globals_dict=None):
+        return timeit.timeit(stmt=test_code, setup=setup_code, number=1, globals=globals_dict)
 
     def estimate_executions_needed(self, single_execution_time, target_time=1.0):
         return target_time / single_execution_time if single_execution_time > 0 else float('inf')
+
+    def estimate_cpu_effort(self, setup_code, test_code, globals_dict=None):
+        single_execution_time = self.time_single_execution(setup_code, test_code, globals_dict)
+        executions_needed = self.estimate_executions_needed(single_execution_time)
+        return single_execution_time, executions_needed
 
     def estimate_cpu_effort_for_reading(self, filename):
         setup_code = f"""
@@ -21,68 +26,76 @@ from contract.json_processor import JSONProcessor
 json_processor = JSONProcessor("{self.json_processor.directory}")
 filename = "{filename}"
 """
-        test_code = """
-json_processor.get_json_data(filename)
-"""
-        single_execution_time = self.time_single_execution(setup_code, test_code)
-        executions_needed = self.estimate_executions_needed(single_execution_time)
-        return single_execution_time, executions_needed
+        test_code = "json_processor.get_json_data(filename)"
+        return self.estimate_cpu_effort(setup_code, test_code)
 
     def estimate_cpu_effort_for_validation(self, filename):
+        json_data = self.json_processor.get_json_data(filename)['data']
         setup_code = f"""
-from contract.json_processor import JSONProcessor
 from contract.data_validator_processor import DataValidatorProcessor
-json_processor = JSONProcessor("{self.json_processor.directory}")
 validator_processor = DataValidatorProcessor("{self.validator_processor.metadata_dir}")
-filename = "{filename}"
-json_data = json_processor.get_json_data(filename)
 """
-        test_code = """
-if json_data['status']:
-    validator_processor.is_figma_data(json_data['data'])
-"""
-        single_execution_time = self.time_single_execution(setup_code, test_code)
-        executions_needed = self.estimate_executions_needed(single_execution_time)
-        return single_execution_time, executions_needed
+        test_code = "validator_processor.is_figma_data(json_data)"
+        return self.estimate_cpu_effort(setup_code, test_code, globals_dict={'json_data': json_data})
 
     def estimate_cpu_effort_for_figma_validation(self, json_data):
         setup_code = f"""
 from contract.data_validator_processor import DataValidatorProcessor
 validator_processor = DataValidatorProcessor("{self.validator_processor.metadata_dir}")
-json_data = {json_data}
 """
-        test_code = """
-validator_processor.is_figma_data(json_data)
-"""
-        single_execution_time = self.time_single_execution(setup_code, test_code)
-        executions_needed = self.estimate_executions_needed(single_execution_time)
-        return single_execution_time, executions_needed
+        test_code = "validator_processor.is_figma_data(json_data)"
+        return self.estimate_cpu_effort(setup_code, test_code, globals_dict={'json_data': json_data})
 
     def estimate_cpu_effort_for_figma_variable_generation(self, json_data):
+        variables = []
+        fm = self.validator_processor.get_modes(json_data['modes'])
         setup_code = f"""
 from contract.data_validator_processor import DataValidatorProcessor
 validator_processor = DataValidatorProcessor("{self.validator_processor.metadata_dir}")
 variables = []
-fm = validator_processor.get_modes({json_data['modes']})
+fm = {fm}
 """
-        test_code = """
-for vo in {json_data['variables']}:
+        test_code = f"""
+for vo in json_data['variables']:
     validator_processor.get_fig_var_spec(vo, fm, variables)
 """
-        single_execution_time = self.time_single_execution(setup_code, test_code)
-        executions_needed = self.estimate_executions_needed(single_execution_time)
-        return single_execution_time, executions_needed
+        return self.estimate_cpu_effort(setup_code, test_code, globals_dict={'json_data': json_data, 'variables': variables})
 
     def estimate_cpu_effort_for_exporting(self, variables):
         setup_code = f"""
 from contract.data_exporter import DataExporter
 exporter = DataExporter("{self.exporter.path}")
-variables = {variables}
 """
-        test_code = """
-exporter.export_to_scss(variables)
-"""
-        single_execution_time = self.time_single_execution(setup_code, test_code)
-        executions_needed = self.estimate_executions_needed(single_execution_time)
-        return single_execution_time, executions_needed
+        test_code = "exporter.export_to_scss(variables)"
+        return self.estimate_cpu_effort(setup_code, test_code, globals_dict={'variables': variables})
 
+    def estimate_total_cpu_effort(self, filename):
+        total_time = 0.0
+
+        # Reading JSON
+        single_execution_time, _ = self.estimate_cpu_effort_for_reading(filename)
+        total_time += single_execution_time
+
+        # Validation
+        json_data = self.json_processor.get_json_data(filename)['data']
+        single_execution_time, _ = self.estimate_cpu_effort_for_validation(filename)
+        total_time += single_execution_time
+
+        if json_data:
+            # Figma Validation
+            single_execution_time, _ = self.estimate_cpu_effort_for_figma_validation(json_data)
+            total_time += single_execution_time
+
+            # Figma Variable Generation
+            single_execution_time, _ = self.estimate_cpu_effort_for_figma_variable_generation(json_data)
+            total_time += single_execution_time
+
+            # Exporting
+            variables = []
+            fm = self.validator_processor.get_modes(json_data['modes'])
+            for vo in json_data['variables']:
+                self.validator_processor.get_fig_var_spec(vo, fm, variables)
+            single_execution_time, _ = self.estimate_cpu_effort_for_exporting(variables)
+            total_time += single_execution_time
+
+        return total_time

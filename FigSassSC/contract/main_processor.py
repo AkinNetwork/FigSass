@@ -30,44 +30,14 @@ class MainProcessor:
         
         return self.validator_processor.is_figma_data(json_data['data'])
 
-    def estimate_cpu_effort(self, filename):
+    def estimate_total_cpu_effort(self, filename):
         try:
             print(f"Estimating CPU effort for processing {filename}...\n")
-            
-            # Reading JSON
-            single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_reading(filename)
-            print(f"CPU Effort for reading {filename}: {single_execution_time:.6f} seconds for a single execution")
-            print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
-
-            # Validation
-            single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_validation(filename)
-            print(f"CPU Effort for validating {filename}: {single_execution_time:.6f} seconds for a single execution")
-            print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
-
-            json_data = self.json_processor.get_json_data(filename)
-            if json_data['status']:
-                # Figma Validation
-                single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_figma_validation(json_data['data'])
-                print(f"CPU Effort for Figma validation: {single_execution_time:.6f} seconds for a single execution")
-                print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
-
-                # Figma Variable Generation
-                single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_figma_variable_generation(json_data['data'])
-                print(f"CPU Effort for Figma variable generation: {single_execution_time:.6f} seconds for a single execution")
-                print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
-
-                # Exporting
-                variables = []
-                fm = self.validator_processor.get_modes(json_data['data']['modes'])
-                for vo in json_data['data']['variables']:
-                    self.validator_processor.get_fig_var_spec(vo, fm, variables)
-                single_execution_time, executions_needed = self.cpu_estimator.estimate_cpu_effort_for_exporting(variables)
-                print(f"CPU Effort for exporting: {single_execution_time:.6f} seconds for a single execution")
-                print(f"Executions needed to achieve 1 second: {executions_needed:.2f}")
 
             # Total CPU effort for the whole process
-            total_cpu_effort = (single_execution_time + executions_needed)
+            total_cpu_effort = self.cpu_estimator.estimate_total_cpu_effort(filename)
             print(f"Total CPU Effort for processing {filename}: {total_cpu_effort:.6f} seconds for a single execution")
+
         except ValueError as e:
             print(e)
 
@@ -76,6 +46,6 @@ if __name__ == "__main__":
     filename = "sample.json"  # Replace with your JSON file name
     try:
         print(f"Validation Result: {processor.validate_json_as_figma(filename)}")
-        processor.estimate_cpu_effort(filename)
+        processor.estimate_total_cpu_effort(filename)
     except ValueError as e:
         print(e)

@@ -73,29 +73,35 @@ exporter = DataExporter("{self.exporter.path}")
         total_time = 0.0
 
         # Reading JSON
-        single_execution_time, _ = self.estimate_cpu_effort_for_reading(filename)
-        total_time += single_execution_time
+        reading_time, _ = self.estimate_cpu_effort_for_reading(filename)
+        total_time += reading_time
+        print(f"CPU Effort for reading JSON: {reading_time:.6f} seconds")
 
         # Validation
         json_data = self.json_processor.get_json_data(filename)['data']
-        single_execution_time, _ = self.estimate_cpu_effort_for_validation(filename)
-        total_time += single_execution_time
+        validation_time, _ = self.estimate_cpu_effort_for_validation(filename)
+        total_time += validation_time
+        print(f"CPU Effort for JSON validation: {validation_time:.6f} seconds")
 
         if json_data:
             # Figma Validation
-            single_execution_time, _ = self.estimate_cpu_effort_for_figma_validation(json_data)
-            total_time += single_execution_time
+            figma_validation_time, _ = self.estimate_cpu_effort_for_figma_validation(json_data)
+            total_time += figma_validation_time
+            print(f"CPU Effort for Figma validation: {figma_validation_time:.6f} seconds")
 
             # Figma Variable Generation
-            single_execution_time, _ = self.estimate_cpu_effort_for_figma_variable_generation(json_data)
-            total_time += single_execution_time
+            figma_variable_generation_time, _ = self.estimate_cpu_effort_for_figma_variable_generation(json_data)
+            total_time += figma_variable_generation_time
+            print(f"CPU Effort for Figma variable generation: {figma_variable_generation_time:.6f} seconds")
 
             # Exporting
             variables = []
             fm = self.validator_processor.get_modes(json_data['modes'])
             for vo in json_data['variables']:
                 self.validator_processor.get_fig_var_spec(vo, fm, variables)
-            single_execution_time, _ = self.estimate_cpu_effort_for_exporting(variables)
-            total_time += single_execution_time
+            exporting_time, _ = self.estimate_cpu_effort_for_exporting(variables)
+            total_time += exporting_time
+            print(f"CPU Effort for exporting variables: {exporting_time:.6f} seconds")
 
+        print(f"Total CPU Effort: {total_time:.6f} seconds")
         return total_time

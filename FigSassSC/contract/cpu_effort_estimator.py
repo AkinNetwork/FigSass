@@ -4,6 +4,8 @@ from contract.data_validator_processor import DataValidatorProcessor
 from contract.data_exporter import DataExporter
 
 class CPUEffortEstimator:
+    TDP = 28  # Thermal Design Power in watts
+
     def __init__(self, directory, metadata_dir, export_path):
         self.json_processor = JSONProcessor(directory)
         self.validator_processor = DataValidatorProcessor(metadata_dir)
@@ -105,3 +107,15 @@ exporter = DataExporter("{self.exporter.path}")
 
         print(f"Total CPU Effort: {total_time:.6f} seconds")
         return total_time
+
+    def calculate_average_power_consumption(self, total_time):
+        """
+        Calculate the average power consumption based on the TDP and total execution time.
+
+        :param total_time: The total execution time in seconds
+        :return: The average power consumption in watt-seconds (joules)
+        """
+        average_power_consumption = self.TDP * total_time  # TDP is in watts, time is in seconds
+        print(f"Average Power Consumption: {average_power_consumption:.2f} joules")
+        return average_power_consumption
+

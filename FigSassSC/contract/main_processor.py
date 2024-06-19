@@ -11,7 +11,7 @@ class MainProcessor:
         self.json_processor = JSONProcessor(directory)
         self.validator_processor = DataValidatorProcessor("env/")
         self.exporter = DataExporter(export_path)
-        self.cpu_estimator = CPUEffortEstimator(directory, "env/", export_path)
+        self.cpu_estimator = CPUEffortEstimator(directory, "en/", export_path)
 
     def main(self):
         json_files_data = self.json_processor.validate_json_files()
@@ -37,6 +37,9 @@ class MainProcessor:
             # Total CPU effort for the whole process
             total_cpu_effort = self.cpu_estimator.estimate_total_cpu_effort(filename)
             print(f"Total CPU Effort for processing {filename}: {total_cpu_effort:.6f} seconds for a single execution")
+
+            # Calculate and print average power consumption
+            self.cpu_estimator.calculate_average_power_consumption(total_cpu_effort)
 
         except ValueError as e:
             print(e)

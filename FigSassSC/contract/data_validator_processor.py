@@ -90,7 +90,7 @@ class DataValidatorProcessor:
 
         if 'valuesByMode' in fvo:
             for key, value in fvo['valuesByMode'].items():
-                variable_value = f"rgba{self.css_rgba_to_decimal(value)}" if fvo['type'] == 'COLOR' else f"{int(value / 16) if (value / 16).is_integer() else round(value / 16, 3)} rem" if fvo['type'] == 'FLOAT' else ""
+                variable_value = f"rgba{self.css_rgba_to_decimal(value)}" if fvo['type'] == 'COLOR' else f"{int(value / 16) if (value / 16).is_integer() else round(value / 16, 3)}rem" if fvo['type'] == 'FLOAT' else ""
                 variable_theme = vm[key] if 'mode' not in vm[key].strip() else ""
                 variables.append({
                     "name": variable_name,
